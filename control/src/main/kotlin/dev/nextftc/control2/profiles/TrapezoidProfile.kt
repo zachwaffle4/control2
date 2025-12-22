@@ -20,6 +20,7 @@ import dev.nextftc.units.unittypes.inchesPerSecondSquared
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
+import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -71,6 +72,7 @@ class TrapezoidProfile<U : Unit<U>>(private val constraints: TrapezoidProfileCon
 
     private lateinit var currentState: MotionState<U>
 
+    private var startTimestamp: ComparableTimeMark? = null
     private var endAccel = 0.0
     private var endVel = 0.0
     private var endDecel = 0.0
@@ -80,6 +82,26 @@ class TrapezoidProfile<U : Unit<U>>(private val constraints: TrapezoidProfileCon
      */
     val totalTime: Double
         get() = endDecel
+
+    /**
+     * Calculates the state of the profile at a given timestamp.
+     *
+     * On the first call, this method records the start timestamp and uses it to compute
+     * elapsed time on subsequent calls.
+     *
+     * @param timestamp The current timestamp.
+     * @param current The current state of the system.
+     * @param goal The desired goal state.
+     *
+     * @return The state of the profile at the given timestamp.
+     */
+    fun calculate(timestamp: ComparableTimeMark, current: MotionState<U>, goal: MotionState<U>): MotionState<U> {
+        if (startTimestamp == null) {
+            startTimestamp = timestamp
+        }
+        val elapsed = timestamp - startTimestamp!!
+        return calculate(elapsed, current, goal)
+    }
 
     /**
      * Calculates the state of the profile at a given time.
@@ -244,6 +266,19 @@ class TrapezoidProfile<U : Unit<U>>(private val constraints: TrapezoidProfileCon
     }
 
     /**
+     * Checks if the profile has finished at the given timestamp.
+     *
+     * @param timestamp The current timestamp.
+     *
+     * @return true if the profile has finished, false otherwise.
+     */
+    fun isFinished(timestamp: ComparableTimeMark): Boolean {
+        val start = startTimestamp ?: return false
+        val elapsed = (timestamp - start).toDouble(DurationUnit.SECONDS)
+        return elapsed >= totalTime
+    }
+
+    /**
      * Checks if the profile has finished at the given time.
      *
      * @param t The time since the beginning of the profile, in seconds.
@@ -251,6 +286,16 @@ class TrapezoidProfile<U : Unit<U>>(private val constraints: TrapezoidProfileCon
      * @return true if the profile has finished, false otherwise.
      */
     fun isFinished(t: Double): Boolean = t >= totalTime
+
+    /**
+     * Resets the profile, clearing the start timestamp.
+     *
+     * Call this method before starting a new motion profile to ensure
+     * the elapsed time is computed correctly from the next [calculate] call.
+     */
+    fun reset() {
+        startTimestamp = null
+    }
 
     /**
      * Flips the sign of the velocity and position if the profile is inverted.
