@@ -20,6 +20,6 @@ kotest = ["kotest-runner", "kotest-assertations", "kotest-property", "kotest-dat
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
+dokka = { id = "org.jetbrains.dokka", version = "2.1.0" }
 nextftc-publishing = { id = "dev.nextftc.publishing.multi-module", version = "1.0.1" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
