@@ -98,6 +98,81 @@ interface MotionState<U : Unit<U>> {
      * @return A [Vector] containing the position, velocity, and acceleration magnitudes
      */
     fun toVector() = makeVector(position.magnitude, velocity.magnitude, acceleration.magnitude)
+
+    /**
+     * Returns the negation of this motion state.
+     *
+     * All components (position, velocity, acceleration) are negated.
+     *
+     * @return A new [MotionState] with all components negated
+     */
+    operator fun unaryMinus() = copy(position = -position, velocity = -velocity, acceleration = -acceleration)
+
+    /**
+     * Adds another motion state to this one, component-wise.
+     *
+     * @param other The motion state to add
+     * @return A new [MotionState] with each component being the sum of the corresponding components
+     */
+    operator fun plus(other: MotionState<U>) = copy(
+        position = position + other.position,
+        velocity = velocity + other.velocity,
+        acceleration = acceleration + other.acceleration,
+    )
+
+    /**
+     * Subtracts another motion state from this one, component-wise.
+     *
+     * This is useful for computing error states (reference - measured).
+     *
+     * @param other The motion state to subtract
+     * @return A new [MotionState] with each component being the difference of the corresponding components
+     */
+    operator fun minus(other: MotionState<U>) = copy(
+        position = position - other.position,
+        velocity = velocity - other.velocity,
+        acceleration = acceleration - other.acceleration,
+    )
+
+    /**
+     * Multiplies this motion state by a scalar, component-wise.
+     *
+     * @param scalar The scalar to multiply by
+     * @return A new [MotionState] with each component multiplied by the scalar
+     */
+    operator fun times(scalar: Double) = copy(
+        position = position * scalar,
+        velocity = velocity * scalar,
+        acceleration = acceleration * scalar,
+    )
+
+    /**
+     * Multiplies this motion state by a scalar, component-wise.
+     *
+     * @param scalar The scalar to multiply by (converted to Double)
+     * @return A new [MotionState] with each component multiplied by the scalar
+     */
+    operator fun times(scalar: Number) = times(scalar.toDouble())
+
+    /**
+     * Divides this motion state by a scalar, component-wise.
+     *
+     * @param divisor The scalar to divide by
+     * @return A new [MotionState] with each component divided by the divisor
+     */
+    operator fun div(divisor: Double) = copy(
+        position = position / divisor,
+        velocity = velocity / divisor,
+        acceleration = acceleration / divisor,
+    )
+
+    /**
+     * Divides this motion state by a scalar, component-wise.
+     *
+     * @param divisor The scalar to divide by (converted to Double)
+     * @return A new [MotionState] with each component divided by the divisor
+     */
+    operator fun div(divisor: Number) = div(divisor.toDouble())
 }
 
 /**
