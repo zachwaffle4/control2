@@ -17,7 +17,6 @@ import dev.nextftc.units.Unit
 import java.util.NavigableMap
 import java.util.TreeMap
 
-
 /**
  * @usesMathJax
  *
@@ -33,9 +32,11 @@ import java.util.TreeMap
  * @return The interpolated value in the output range
  */
 fun lerp(value: Double, inputMin: Double, inputMax: Double, outputMin: Double, outputMax: Double) =
-    if (inputMin == inputMax) 0.0
-    else
+    if (inputMin == inputMax) {
+        0.0
+    } else {
         outputMin + (value - inputMin) * (outputMax - outputMin) / (inputMax - inputMin)
+    }
 
 /**
  * @usesMathJax
@@ -96,8 +97,7 @@ fun lerpLookup(source: List<Double>, target: List<Double>, query: Double): Doubl
  * @param t interpolation factor, typically in the range \([0, 1]\)
  * @return interpolated matrix
  */
-fun <R: Nat, C: Nat> lerpMatrix(t: Double, low: Matrix<R, C>, high: Matrix<R, C>) =
-    low + (high - low) * t
+fun <R : Nat, C : Nat> lerpMatrix(t: Double, low: Matrix<R, C>, high: Matrix<R, C>) = low + (high - low) * t
 
 /**
  * Linearly interpolates between two measures at value [t].
@@ -105,8 +105,7 @@ fun <R: Nat, C: Nat> lerpMatrix(t: Double, low: Matrix<R, C>, high: Matrix<R, C>
  * @param t interpolation factor, typically in the range \([0, 1]\)
  * @return interpolated measure
  */
-fun <U: Unit<U>> lerpMeasure(t: Double, low: Measure<U>, high: Measure<U>) =
-    low + (high - low) * t
+fun <U : Unit<U>> lerpMeasure(t: Double, low: Measure<U>, high: Measure<U>) = low + (high - low) * t
 
 /**
  * A navigable map that supports interpolation between values.
@@ -124,14 +123,12 @@ fun <U: Unit<U>> lerpMeasure(t: Double, low: Measure<U>, high: Measure<U>) =
  *
  * @throws IllegalArgumentException if the number of keys and values do not match.
  */
-class InterpolatingMap<T> private constructor(
-    val tree: TreeMap<Double, T>,
-    val interpolate: (T, T, Double) -> T
-) : NavigableMap<Double, T> by tree {
+class InterpolatingMap<T> private constructor(val tree: TreeMap<Double, T>, val interpolate: (T, T, Double) -> T) :
+    NavigableMap<Double, T> by tree {
     constructor(interpolator: (T, T, Double) -> T) : this(TreeMap(), interpolator)
 
     constructor(interpolator: (T, T, Double) -> T, keys: List<Double>, values: List<T>) :
-            this(TreeMap(), interpolator) {
+        this(TreeMap(), interpolator) {
         require(keys.size == values.size) { "Keys and values must be the same size" }
         for (i in keys.indices) {
             tree[keys[i]] = values[i]
